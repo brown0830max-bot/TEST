@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宗教「辦事」框架總覽</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Noto Sans TC 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 網頁自定義樣式 -->
+    <style>
+        /* 新配色：主色調 Teal (湖水綠) */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDFBF8; /* 淺暖色背景 */
+            color: #1a202c; /* 深色文字 */
+            scroll-behavior: smooth;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        /* 導航活躍和懸停顏色：Teal 搭配 Amber */
+        .nav-link:hover, .nav-link.active {
+            color: #06B6D4; /* 亮湖水綠 */
+            border-bottom-color: #FBBF24; /* 琥珀色/金色 */
+            font-weight: 700;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EFEAE4;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer; /* 統一為可互動 */
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        }
+        /* Modal 樣式 - 加入淡入效果 */
+        .modal {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .modal.is-open {
+            display: flex;
+            opacity: 1;
+        }
+        /* 流程步驟樣式 */
+        .flow-step {
+            transition: all 0.3s ease;
+        }
+        /* 流程步驟活躍狀態 */
+        .flow-step.active {
+            border-top-color: #0D9488 !important; /* 深湖水綠 */
+            background-color: #F0FDFA; /* 淺綠背景 */
+        }
+        /* 流程細節面板 - 動畫效果 */
+        #flow-detail-panel {
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
+        }
+        .hidden-transition {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+        }
+        .visible-transition {
+            max-height: 500px; /* 足夠大的數值 */
+            opacity: 1;
+        }
+
+        /* 第三章 折疊卡片樣式 - 優化過渡 */
+        .collapsible-icon {
+            transition: transform 0.3s ease;
+        }
+        .collapsible-content {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        .collapsible-content.active {
+            max-height: 500px; 
+            opacity: 1;
+        }
+        .collapsible-icon.rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* === 故事動畫效果 === */
+        @keyframes story-slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .story-animated-text {
+            display: block;
+            margin-bottom: 0.75rem; /* Tailwind class: mb-3 */
+            animation: story-slide-up 0.6s ease-out forwards; /* 增加到 0.6s */
+            opacity: 0; /* 預設隱藏 */
+        }
+        .story-animated-text:last-child {
+            margin-bottom: 0;
+        }
+        /* 故事總結強調文字樣式 */
+        .story-highlight {
+            font-weight: 700;
+            color: #0F766E; /* Teal 700 */
+            display: block;
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed #A7F3D0;
+        }
+        
+        /* 總結儀表板卡片動畫 */
+        .summary-dashboard .card-item {
+            transition: all 0.3s ease-in-out;
+            cursor: default; /* 取消手型，避免與上面的 .card 衝突 */
+        }
+        .summary-dashboard .card-item:hover {
+            transform: scale(1.05);
+            background-color: #F0FDFA;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 頁面切換效果 */
+        #main-dashboard, #deep-dive-page, #deity-hub-page {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .dashboard-hidden {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .dashboard-visible {
+            opacity: 1;
+            height: auto;
+        }
+        /* 深度頁面模組動畫 */
+        .deep-dive-module {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .deep-dive-module.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === 深度頁面專屬樣式強化 (Deep Dive Page Styles) === */
+        #deep-dive-page .text-lg, #deep-dive-page .text-xl {
+            line-height: 1.8; /* 增加行高，提升閱讀性 */
+        }
+        #deep-dive-page .deep-dive-module p {
+            font-weight: 500; /* 內文適當加粗 */
+        }
+        #deep-dive-page .deep-dive-module:nth-child(1) {
+            /* 自述區塊特別樣式 */
+            background-color: #F8F4EF; /* 柔和淺黃背景 */
+            border-left: 8px solid #EAB308; /* 金色邊框 */
+        }
+        #deep-dive-page h4, #deep-dive-page h5 {
+            font-weight: 900; /* 標題使用最粗字重 */
+        }
+        #deep-dive-page .process-step-item {
+            transition: all 0.3s ease;
+        }
+        #deep-dive-page .process-step-item:hover {
+            background-color: #F0FDFA;
+            border-color: #0D9488;
+        }
+        
+        /* === 神明互動頁面專屬樣式 === */
+        .deity-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border-top: 4px solid transparent;
+        }
+        .deity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        }
+        .deity-tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            margin-right: 0.4rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            line-height: 1;
+            background-color: #E0F2F1; /* Teal 50 */
+            color: #0D9488; /* Teal 700 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation (頂部固定導航欄 - 主儀表板使用) -->
+    <header id="header" class="bg-teal-700/95 backdrop-blur-sm sticky top-0 z-50 shadow-md border-b border-teal-500/50">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="flex items-center justify-between h-20">
+                <h1 class="text-2xl font-black text-amber-300">🪐 靈性工程學</h1>
+                <nav class="hidden lg:flex items-center space-x-4 text-base font-medium">
+                    <!-- 新增 main-nav-item 類別用於 JS 切換可見性 -->
+                    <a href="#chap1" class="nav-link text-white pb-1 main-nav-item">流程圖</a>
+                    <a href="#chap2" class="nav-link text-white pb-1 main-nav-item">需求金字塔</a>
+                    <a href="#chap3" class="nav-link text-white pb-1 main-nav-item">社會功能</a>
+                    <a href="#chap4" class="nav-link text-white pb-1 main-nav-item">組織結構</a>
+                    <a href="#chap5" class="nav-link text-white pb-1 main-nav-item">內功哲學</a>
+                    <!-- 深度解析切換按鈕 (主頁按鈕) -->
+                    <button id="deep-dive-toggle" class="px-4 py-2 rounded-full font-bold bg-amber-400 text-teal-800 hover:bg-amber-300 transition shadow-md">靈修深度解析</button>
+                    <!-- 新增: 神明互動切換按鈕 -->
+                    <button id="deity-hub-toggle" class="px-4 py-2 rounded-full font-bold bg-white text-teal-800 hover:bg-gray-100 transition shadow-md">神明互動</button>
+                </nav>
+                <div class="lg:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none p-2 rounded-lg hover:bg-teal-600 transition">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu (移動版選單) -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-teal-700 shadow-xl border-t border-teal-600">
+            <a href="#chap1" class="block py-3 px-6 text-base font-medium text-white hover:bg-teal-600 mobile-nav-link">第一章：流程圖</a>
+            <a href="#chap2" class="block py-3 px-6 text-base font-medium text-white hover:bg-teal-600 mobile-nav-link">第二章：需求金字塔</a>
+            <a href="#chap3" class="block py-3 px-6 text-base font-medium text-white hover:bg-teal-600 mobile-nav-link">第三章：社會功能</a>
+            <a href="#chap4" class="block py-3 px-6 text-base font-medium text-white hover:bg-teal-600 mobile-nav-link">第四章：組織結構</a>
+            <a href="#chap5" class="block py-3 px-6 text-base font-medium text-white hover:bg-teal-600 mobile-nav-link">第五/六章：內功哲學</a>
+            <button id="mobile-deep-dive-toggle" class="block w-full py-3 px-6 text-base font-bold bg-amber-400 text-teal-800 hover:bg-amber-300 transition">靈修深度解析</button>
+            <button id="mobile-deity-hub-toggle" class="block w-full py-3 px-6 text-base font-bold bg-white text-teal-800 hover:bg-gray-100 transition">神明互動</button>
+        </div>
+    </header>
+
+    <!-- 主儀表板內容 -->
+    <div id="main-dashboard" class="dashboard-visible">
+        <main class="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+            <!-- Main Summary / Hero Section -->
+            <section class="text-center mb-16 md:mb-24 p-10 bg-teal-700 text-white rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">🎯 宗教「辦事」核心框架總覽</h2>
+                <p class="text-xl max-w-4xl mx-auto opacity-80 mt-4">透過五大互動模組，系統化解析靈性實踐的運作機制、社會功能與哲學根基。</p>
+            </section>
+
+            <!-- Chapter 1: Process (流程) - 互動式步驟與細節面板 (Slide-Down/Up 動畫) -->
+            <section id="chap1" class="py-12 md:py-20 border-b border-gray-200">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">1️⃣ 核心流程：從「問」到「落實」</h3>
+                <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-10 text-center">辦事是一個**線性、嚴謹**的循環過程。**點擊步驟**，查看其詳細角色與核心行動。</p>
+
+                <div class="flex flex-col md:flex-row justify-center items-stretch space-y-4 md:space-y-0 md:space-x-4 max-w-5xl mx-auto">
+                    
+                    <!-- Step 1: 問事 (起點) -->
+                    <div data-step="ask" class="flow-step group w-full card p-6 rounded-xl bg-gray-50 border-t-4 border-transparent hover:border-teal-400">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-xl text-teal-700">問事 (起點)</h4>
+                            <span class="text-lg text-gray-500 group-hover:text-teal-600 font-extrabold">01</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">提問人生難題</p>
+                    </div>
+                    
+                    <div class="md:w-12 flex items-center justify-center">
+                        <span class="text-3xl text-teal-400 hidden md:block">→</span>
+                    </div>
+
+                    <!-- Step 2: 解事 / 辦事 (核心) -->
+                    <div data-step="solve" class="flow-step group w-full card p-6 rounded-xl bg-gray-50 border-t-4 border-transparent hover:border-teal-400">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-xl text-teal-700">解事 / 辦事 (核心)</h4>
+                            <span class="text-lg text-gray-500 group-hover:text-teal-600 font-extrabold">02</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">神明裁示與行動</p>
+                    </div>
+
+                    <div class="md:w-12 flex items-center justify-center">
+                        <span class="text-3xl text-teal-400 hidden md:block">→</span>
+                    </div>
+
+                    <!-- Step 3: 執行 / 落實 (終點) -->
+                    <div data-step="role" class="flow-step group w-full card p-6 rounded-xl bg-gray-50 border-t-4 border-transparent hover:border-teal-400">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-xl text-teal-700">執行 / 落實 (終點)</h4>
+                            <span class="text-lg text-gray-500 group-hover:text-teal-600 font-extrabold">03</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">角色分工與還願</p>
+                    </div>
+                </div>
+
+                <!-- Detail Panel (點擊後動態顯示 - 應用 Slide 動畫) -->
+                <div id="flow-detail-panel" class="mt-10 p-8 bg-teal-50/50 rounded-xl shadow-inner hidden-transition max-w-5xl mx-auto">
+                    <h4 id="panel-title" class="font-black text-2xl mb-3 text-teal-800"></h4>
+                    <p id="panel-content" class="text-gray-700 text-lg"></p>
+                    <p id="panel-roles" class="text-sm text-teal-600 mt-4 font-semibold"></p>
+                </div>
+            </section>
+            
+            <!-- Chapter 2: Needs (需求層次) - CSS Pyramid Visualization -->
+            <section id="chap2" class="py-12 md:py-20 border-b border-gray-200">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">2️⃣ 人類需求：靈性金字塔模型</h3>
+                <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-10 text-center">辦事系統滿足從生存到自我超越的六層靈性需求。**點擊任一層**，查看其核心作用與實例。</p>
+                
+                <!-- Pyramid Visualization -->
+                <div class="flex flex-col-reverse items-center space-y-2 max-w-2xl mx-auto">
+                    <!-- Level 6: 超越意義 -->
+                    <div data-need="transcendence" class="need-block w-full card p-4 rounded-lg text-center bg-purple-100 hover:bg-purple-200 border-b-4 border-purple-500">
+                        <h4 class="font-bold text-lg text-purple-800">⑥ 超越意義 (使命與貢獻)</h4>
+                    </div>
+                    <!-- Level 5: 自我實現 -->
+                    <div data-need="self_actualization" class="need-block w-11/12 card p-4 rounded-lg text-center bg-indigo-100 hover:bg-indigo-200 border-b-4 border-indigo-500">
+                        <h4 class="font-bold text-lg text-indigo-800">⑤ 自我實現 (方向與勇氣)</h4>
+                    </div>
+                    <!-- Level 4: 成就地位 -->
+                    <div data-need="esteem" class="need-block w-10/12 card p-4 rounded-lg text-center bg-blue-100 hover:bg-blue-200 border-b-4 border-blue-500">
+                        <h4 class="font-bold text-lg text-blue-800">④ 成就地位 (肯定與加持)</h4>
+                    </div>
+                    <!-- Level 3: 人際情感 -->
+                    <div data-need="belonging" class="need-block w-9/12 card p-4 rounded-lg text-center bg-green-100 hover:bg-green-200 border-b-4 border-green-500">
+                        <h4 class="font-bold text-lg text-green-800">③ 人際情感 (愛與歸屬)</h4>
+                    </div>
+                    <!-- Level 2: 經濟生活 -->
+                    <div data-need="economy" class="need-block w-8/12 card p-4 rounded-lg text-center bg-yellow-100 hover:bg-yellow-200 border-b-4 border-yellow-500">
+                        <h4 class="font-bold text-lg text-yellow-800">② 經濟生活 (穩定與庇護)</h4>
+                    </div>
+                    <!-- Level 1: 生命保障 -->
+                    <div data-need="safety" class="need-block w-7/12 card p-4 rounded-lg text-center bg-red-100 hover:bg-red-200 border-b-4 border-red-500">
+                        <h4 class="font-bold text-lg text-red-800">① 生命保障 (生存與安全)</h4>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 3: Function (社會功能) - 折疊式卡片 (Max-Height 過渡動畫) -->
+            <section id="chap3" class="py-12 md:py-20 border-b border-gray-200 bg-gray-50/50 rounded-xl p-6 md:p-12">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">3️⃣ 社會功能：三重核心驅動力</h3>
+                <p class="text-gray-600 max-w-4xl mx-auto mb-10 text-center">辦事 = 心理安慰 + 行動推力 + 意義賦予。**點擊卡片**查看詳細說明。</p>
+
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <!-- 安心感 Card -->
+                    <div data-collapsible="safety" class="collapsible-card card p-6 rounded-xl border-l-8 border-green-500 hover:shadow-lg">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl text-green-600">✅</div>
+                                <h4 class="font-bold text-2xl text-green-700">安心感 (減輕焦慮)</h4>
+                            </div>
+                            <svg class="w-6 h-6 transition-transform transform collapsible-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="collapsible-content mt-4 border-t pt-4 text-gray-700">
+                            <p class="font-medium mb-2">**個體層面：** 透過神明裁示或儀式，給予信徒明確的**方向感**，將不確定的恐懼轉化為可處理的任務，從而減輕面對人生難題的焦慮。</p>
+                            <p class="text-sm text-gray-500 mt-2">範例：收驚、解厄、詢問未來走向。</p>
+                        </div>
+                    </div>
+                    <!-- 信心 Card -->
+                    <div data-collapsible="confidence" class="collapsible-card p-6 rounded-xl border-l-8 border-yellow-500 hover:shadow-lg">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl text-yellow-600">💪</div>
+                                <h4 class="font-bold text-2xl text-yellow-700">信心 (行動推力)</h4>
+                            </div>
+                            <svg class="w-6 h-6 transition-transform transform collapsible-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="collapsible-content mt-4 border-t pt-4 text-gray-700">
+                            <p class="font-medium mb-2">**行動層面：** 獲得神明或天命的**肯定與加持**後，信徒敢於放手一搏，強化行動的勇氣和力量，打破猶豫不決的狀態。</p>
+                            <p class="text-sm text-gray-500 mt-2">範例：考試祈福、創業求籤、尋求升遷。</p>
+                        </div>
+                    </div>
+                    <!-- 意義感 Card -->
+                    <div data-collapsible="meaning" class="collapsible-card card p-6 rounded-xl border-l-8 border-blue-500 hover:shadow-lg">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl text-blue-600">🌟</div>
+                                <h4 class="font-bold text-2xl text-blue-700">意義感 (連結社會)</h4>
+                            </div>
+                            <svg class="w-6 h-6 transition-transform transform collapsible-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="collapsible-content mt-4 border-t pt-4 text-gray-700">
+                            <p class="font-medium mb-2">**社會層面：** 將個人的追求與更大的**集體使命**相連（如普度、公益），從而超越自我，獲得被社會認可的精神價值與使命感。</p>
+                            <p class="text-sm text-gray-500 mt-2">範例：參與建醮、捐獻、社會公益活動的宗教背書。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 4: Deity System (神明結構) - 組織圖視覺化 -->
+            <section id="chap4" class="py-12 md:py-20 border-b border-gray-100">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">4️⃣ 神明結構：靈界政府組織圖</h3>
+                <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-10 text-center">靈界階層化管理，信徒報案，部門長官處理。**點擊各部門**查看專職長官。</p>
+                
+                <!-- Org Chart Container -->
+                <div class="flex flex-col items-center max-w-6xl mx-auto">
+                    
+                    <!-- Level Filter (新增互動篩選器) -->
+                    <div class="flex space-x-4 mb-6 p-3 bg-gray-100 rounded-lg shadow-inner text-sm">
+                        <button data-filter="all" class="level-filter-btn px-4 py-2 rounded-full font-semibold bg-teal-500 text-white hover:bg-teal-600 transition">顯示全部</button>
+                        <button data-filter="supreme" class="level-filter-btn px-4 py-2 rounded-full font-semibold bg-white text-teal-800 border hover:bg-teal-50 transition">最高層</button>
+                        <button data-filter="regional" class="level-filter-btn px-4 py-2 rounded-full font-semibold bg-white text-amber-800 border hover:bg-amber-50 transition">中階主管</button>
+                        <button data-filter="functional" class="level-filter-btn px-4 py-2 rounded-full font-semibold bg-white text-gray-800 border hover:bg-gray-200 transition">功能部門</button>
+                    </div>
+
+                    <!-- Level 1: Supreme Authority -->
+                    <div data-level="supreme" class="org-card bg-teal-900 text-amber-300 font-black py-4 px-8 rounded-xl shadow-2xl text-2xl mb-8 transition transform duration-500 level-visible">
+                        🌐 最高層 (總統/最高法院)
+                        <p class="text-sm font-normal mt-1 opacity-90 text-white">玉皇大帝、三清</p>
+                    </div>
+                    <div class="w-1 h-8 bg-teal-400 level-visible transition duration-500"></div>
+
+                    <!-- Level 2: Regional Management -->
+                    <div data-level="regional" class="org-card bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow-xl text-xl mb-8 transition transform duration-500 level-visible">
+                        🏙️ 中階主管 (地方政府/法官)
+                        <p class="text-sm font-normal mt-1 opacity-90">城隍爺、土地公、王爺</p>
+                    </div>
+                    <div class="w-1 h-8 bg-teal-400 level-visible transition duration-500"></div>
+
+                    <!-- Level 3: Functional Departments -->
+                    <div data-level="functional" class="text-xl font-bold text-teal-600 mb-6 transition transform duration-500 level-visible">功能部門 (專職處理)</div>
+                    <div data-level="functional" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 w-full transition transform duration-500 level-visible">
+                        <button data-modal-target="dept-medical" class="dept-button card p-5 rounded-lg bg-red-50 hover:bg-red-200 font-medium text-lg border-b-4 border-red-500">🏥 醫療部門</button>
+                        <button data-modal-target="dept-finance" class="dept-button card p-5 rounded-lg bg-yellow-50 hover:bg-yellow-200 font-medium text-lg border-b-4 border-yellow-500">💰 財政部門</button>
+                        <button data-modal-target="dept-edu" class="dept-button card p-5 rounded-lg bg-blue-50 hover:bg-blue-200 font-medium text-lg border-b-4 border-blue-500">📚 教育部門</button>
+                        <button data-modal-target="dept-justice" class="dept-button card p-5 rounded-lg bg-gray-100 hover:bg-gray-300 font-medium text-lg border-b-4 border-gray-500">⚖️ 司法部門</button>
+                        <button data-modal-target="dept-military" class="dept-button card p-5 rounded-lg bg-green-50 hover:bg-green-200 font-medium text-lg border-b-4 border-green-500">⚔️ 軍事部門</button>
+                        <button data-modal-target="dept-welfare" class="dept-button card p-5 rounded-lg bg-purple-50 hover:bg-purple-200 font-medium text-lg border-b-4 border-purple-500">🕊️ 社會福利</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 5 & 6: Cultivation & Philosophy (內功與哲學) - Tabbed Interface -->
+            <section id="chap5" class="py-12 md:py-20 bg-gray-50/50 rounded-xl p-6 md:p-12">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">5️⃣ 內功與哲學：雙基礎</h3>
+                <p class="text-gray-600 max-w-4xl mx-auto mb-10 text-center">「辦事」是外顯的行動，而「靈修內功」與「哲學基礎」則是其內在的支撐。</p>
+
+                <div class="max-w-6xl mx-auto">
+                    <!-- Tabs Navigation -->
+                    <div class="flex border-b border-gray-200 mb-8">
+                        <button data-tab="inner_skill" class="tab-button py-3 px-6 text-lg font-bold border-b-4 border-orange-500 text-orange-700 active-tab transition duration-200">
+                            靈修內功 (內在鍛鍊)
+                        </button>
+                        <button data-tab="philosophy" class="tab-button py-3 px-6 text-lg font-bold border-b-4 border-transparent text-gray-500 hover:text-emerald-700 hover:border-emerald-500 transition duration-200">
+                            哲學基礎 (理論背書)
+                        </button>
+                    </div>
+
+                    <!-- Tab Content: 靈修內功 -->
+                    <div id="tab-inner_skill" class="tab-content card p-8 rounded-xl border-l-8 border-orange-500 shadow-lg active-content">
+                        <h4 class="font-bold text-2xl mb-4 text-orange-700">第五章：靈修的內外功 (內功修煉)</h4>
+                        <p class="text-gray-600 mb-6 text-lg">靈修是辦事的內功，目的在於安定心靈、強化感應、成為可靠的神明媒介。</p>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-orange-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-orange-800 mb-1">目的</p>
+                                <p class="text-sm text-gray-700">安定心靈、強化感應、成為神明媒介。</p>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-orange-800 mb-1">過程</p>
+                                <p class="text-sm text-gray-700">靜心（打坐） → 感應（夢境、直覺） → 通靈（乩童、扶鸞）。</p>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-orange-800 mb-1">功能</p>
+                                <p class="text-sm text-gray-700">保證辦事正當性、穩定信徒信任。</p>
+                            </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: 道德經基礎 -->
+                    <div id="tab-philosophy" class="tab-content hidden card p-8 rounded-xl border-l-8 border-emerald-500 shadow-lg">
+                        <h4 class="font-bold text-2xl mb-4 text-emerald-700">第六章：《道德經》哲學基礎 (理論背書)</h4>
+                        <p class="text-gray-600 mb-6 text-lg">《道德經》為靈修與辦事提供了「哲學背書」，使宗教實踐與天地自然法則相連。</p>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-emerald-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-emerald-800 mb-1">致虛守靜</p>
+                                <p class="text-sm text-gray-700">靈修要「空」與「靜」，才能感應神明。</p>
+                            </div>
+                            <div class="bg-emerald-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-emerald-800 mb-1">無為而治</p>
+                                <p class="text-sm text-gray-700">辦事是順應天命，而非強行操控。</p>
+                            </div>
+                            <div class="bg-emerald-50 p-4 rounded-lg">
+                                <p class="font-bold text-base text-emerald-800 mb-1">一以貫之</p>
+                                <p class="text-sm text-gray-700">「神得一以靈」，力量來自「合一於道」。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Final Summary Dashboard (新增) -->
+            <section id="summary" class="py-12 md:py-20">
+                <h3 class="text-3xl font-extrabold mb-12 text-center text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">🎯 總結：六大核心概念儀表板</h3>
+                <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-10 text-center">快速回顧靈性工程學框架的六個關鍵維度。</p>
+                
+                <div class="summary-dashboard grid md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-7xl mx-auto">
+                    <div class="card-item card p-6 rounded-xl bg-teal-50 border-t-4 border-teal-500 text-center">
+                        <div class="text-4xl mb-3 text-teal-700">⚙️</div>
+                        <h4 class="font-bold text-lg mb-1">標準流程</h4>
+                        <p class="text-sm text-gray-600">問事 → 解事 → 儀式 → 落實</p>
+                    </div>
+                    <div class="card-item card p-6 rounded-xl bg-amber-50 border-t-4 border-amber-500 text-center">
+                        <div class="text-4xl mb-3 text-amber-700">✨</div>
+                        <h4 class="font-bold text-lg mb-1">需求金字塔</h4>
+                        <p class="text-sm text-gray-600">從生存到超越的六層次</p>
+                    </div>
+                    <div class="card-item card p-6 rounded-xl bg-green-50 border-t-4 border-green-500 text-center">
+                        <div class="text-4xl mb-3 text-green-700">❤️</div>
+                        <h4 class="font-bold text-lg mb-1">社會功能</h4>
+                        <p class="text-sm text-gray-600">安心、信心、意義感</p>
+                    </div>
+                    <div class="card-item card p-6 rounded-xl bg-blue-50 border-t-4 border-blue-500 text-center">
+                        <div class="text-4xl mb-3 text-blue-700">🏛️</div>
+                        <h4 class="font-bold text-lg mb-1">神明結構</h4>
+                        <p class="text-sm text-gray-600">靈界政府，部門分工</p>
+                    </div>
+                    <div class="card-item card p-6 rounded-xl bg-orange-50 border-t-4 border-orange-500 text-center">
+                        <div class="text-4xl mb-3 text-orange-700">🧘</div>
+                        <h4 class="font-bold text-lg mb-1">靈修內功</h4>
+                        <p class="text-sm text-gray-600">靜心、感應、通靈</p>
+                    </div>
+                    <div class="card-item card p-6 rounded-xl bg-emerald-50 border-t-4 border-emerald-500 text-center">
+                        <div class="text-4xl mb-3 text-emerald-700">☯️</div>
+                        <h4 class="font-bold text-lg mb-1">哲學基礎</h4>
+                        <p class="text-sm text-gray-600">致虛守靜，無為而治</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div> <!-- End of main-dashboard -->
+
+    <!-- === 靈修深度解析頁面 (第二頁) === -->
+    <div id="deep-dive-page" class="dashboard-hidden">
+        <header class="bg-white/95 backdrop-blur-sm sticky top-0 z-40 shadow-md border-b border-gray-100">
+            <div class="container mx-auto px-4 max-w-7xl">
+                <!-- 修正: 只保留返回按鈕 -->
+                <nav class="flex items-center justify-start h-16 text-base font-medium space-x-4">
+                    <button id="deep-dive-back" class="flex-shrink-0 px-3 py-1 rounded-full font-bold bg-teal-500 text-white hover:bg-teal-600 transition shadow-md">← 返回主儀表板</button>
+                </nav>
+            </div>
+        </header>
+        <section class="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+            <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight text-teal-800 border-b-4 border-amber-300 pb-2">🧘 靈修者的自我陳述：深度解析</h2>
+            <p class="text-2xl italic font-medium text-gray-600 mb-12" style="line-height: 1.6;">—— 透過內在的靜定，尋找與神明的連結，提升生命的意義與力量。</p>
+
+            <!-- 自述區塊 (Deep Dive Module 1) -->
+            <div class="deep-dive-module space-y-6 mb-16 p-8 bg-gray-50 rounded-xl shadow-2xl border-l-8 border-amber-500" style="--delay: 0.1s;">
+                <h3 class="text-3xl font-black text-amber-700 border-b pb-2">🌿 靈修者的自我陳述：內在安定</h3>
+                <p class="text-lg font-medium text-gray-700" style="line-height: 1.8;">生命的意義是為了**幸福**、**創造價值**，而最核心的目標是找到內心的**安定**。我們認為靈修的功能，正是透過我們所相信的神明力量，為社會創造價值、貢獻，同時讓我們個人感到真正的幸福。</p>
+                <p class="text-lg font-medium text-gray-700" style="line-height: 1.8;">在靈修中，我專注於讓心靜下來，去除煩惱與雜念。這份靜定不是逃避現實，而是一種**靈性調頻**。當心安定下來，我才能更清楚地感受到方向，甚至在迷惘時獲得神明的啟示。</p>
+                <p class="text-xl font-bold text-teal-700 mt-6" style="line-height: 1.6;">✨ 核心體悟：靈修讓我的日常提升到另一個層次。工作不只是謀生，而是實踐；家庭不只是責任，而是供養；創造不只是表達，而是奉獻。當一切都能與神聖相連，我的生活就充滿了意義。</p>
+            </div>
+
+            <!-- 目的與對比 (Deep Dive Module 2) -->
+            <div class="deep-dive-module grid md:grid-cols-2 gap-8 mb-16" style="--delay: 0.4s;">
+                <div class="p-8 bg-amber-100 rounded-xl shadow-lg border-t-8 border-amber-600">
+                    <h4 class="font-black text-2xl mb-4 text-amber-900">1️⃣ 靈修的目的 (核心訴求)</h4>
+                    <ul class="list-none space-y-3 text-lg font-medium text-gray-800">
+                        <li class="flex items-center space-x-2"><span class="text-teal-600 text-xl font-black">●</span> 內在調整：讓心靜下來。</li>
+                        <li class="flex items-center space-x-2"><span class="text-teal-600 text-xl font-black">●</span> 靈感培養：打開「接收神明訊息」的感官。</li>
+                        <li class="flex items-center space-x-2"><span class="text-teal-600 text-xl font-black">●</span> 媒介角色：成為神明的「通道」。</li>
+                    </ul>
+                </div>
+                <div class="p-8 bg-teal-100 rounded-xl shadow-lg border-t-8 border-teal-600">
+                    <h4 class="font-black text-2xl mb-4 text-teal-900">🎯 辦事與靈修的關係</h4>
+                    <p class="text-xl font-extrabold text-teal-700 mb-4">靈修是 **對內的鍛鍊**。</p>
+                    <p class="text-xl font-extrabold text-amber-700 mb-4">辦事是 **對外的服務**。</p>
+                    <p class="text-base text-gray-600 mt-4">👉 靈修的品質，決定了辦事結果的深度、正當性與靈驗度。</p>
+                </div>
+            </div>
+
+            <!-- 過程模組 (Deep Dive Module 3) -->
+            <div class="deep-dive-module mb-16" style="--delay: 0.7s;">
+                <h4 class="text-3xl font-black mb-8 text-teal-800 border-b-4 border-teal-300 pb-2">2️⃣ 靈修的過程：內功層次遞進</h4>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- 基礎層 -->
+                    <div class="process-step-item bg-white p-6 rounded-xl shadow-xl border-b-4 border-gray-300 hover:border-teal-500">
+                        <p class="text-5xl mb-3 text-gray-500 font-extrabold">1</p>
+                        <h5 class="font-black text-xl text-teal-800 mb-2">靜心（基礎）</h5>
+                        <p class="text-base text-gray-600">打坐、誦經、持咒、祈禱。目的：讓心沉澱，達到**「致虛守靜」**的狀態。</p>
+                    </div>
+                    <!-- 進階層 -->
+                    <div class="process-step-item bg-white p-6 rounded-xl shadow-xl border-b-4 border-gray-400 hover:border-teal-500">
+                        <p class="text-5xl mb-3 text-gray-600 font-extrabold">2</p>
+                        <h5 class="font-black text-xl text-teal-800 mb-2">感應（進階）</h5>
+                        <p class="text-base text-gray-600">夢境啟示、心靈感應、身體震動。目的：提升**「靈敏度」**，捕捉超感官訊號。</p>
+                    </div>
+                    <!-- 高階層 -->
+                    <div class="process-step-item bg-white p-6 rounded-xl shadow-xl border-b-4 border-gray-500 hover:border-teal-500">
+                        <p class="text-5xl mb-3 text-gray-700 font-extrabold">3</p>
+                        <h5 class="font-black text-xl text-teal-800 mb-2">通靈/起乩（高階）</h5>
+                        <p class="text-base text-gray-600">乩童降駕、扶鸞手寫字。目的：不只是接收，而是**「傳達」與「執行」**。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能與案例 (Deep Dive Module 4) -->
+            <div class="deep-dive-module mb-16 p-10 bg-teal-800 text-white rounded-xl shadow-2xl" style="--delay: 1.0s;">
+                <h4 class="text-3xl font-black mb-6 border-b border-teal-600 pb-2 text-amber-300">3️⃣ 靈修的社會功能與實例</h4>
+                <div class="grid md:grid-cols-2 gap-x-10 gap-y-8">
+                    <div>
+                        <h5 class="font-black text-xl mb-3 text-white">社會功能：正當性與信任</h5>
+                        <ul class="list-disc list-inside space-y-3 text-lg font-medium text-gray-200 ml-4">
+                            <li>**保證辦事的正當性：** 讓信徒相信這是「真的神明降臨」。</li>
+                            <li>**穩定信徒的信心：** 透過修為，讓信徒更容易接受指示。</li>
+                            <li>**文化層次的「內功」：** 提升宗教的專業訓練與系統性。</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="font-black text-xl mb-3 text-white">4️⃣ 有趣案例 (修為的證明)</h5>
+                        <ul class="list-disc list-inside space-y-3 text-lg font-medium text-gray-200 ml-4">
+                            <li>**扶鸞案例：** 清代文人齋戒靜坐，集體扶鸞寫詩文，展現「靈修後的聖示」。</li>
+                            <li>**乩童修煉：** 閉關靜養、吃素戒酒，是為了讓身體能承受神明降駕的「身心準備」。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最終總結 (Deep Dive Module 5) -->
+            <div class="deep-dive-module text-center p-10 bg-white rounded-xl border-t-8 border-orange-500 shadow-2xl" style="--delay: 1.3s;">
+                <h4 class="font-black text-3xl text-orange-700 mb-4">📌 總結：靈修在「辦事」中，就像武功的內功</h4>
+                <p class="text-xl text-gray-700 italic font-medium">沒有內功（靈修）→ 辦事只是外在儀式，缺乏深度。</p>
+                <p class="text-xl text-teal-800 font-black mt-3">有內功（靈修）→ 辦事才真正「有靈」，能夠連結神明、安定信徒、穩固社會信仰。</p>
+            </div>
+        </section>
+    </div> <!-- End of deep-dive-page -->
+    
+    <!-- === 神明互動頁面 (Deity Hub Page) === -->
+    <div id="deity-hub-page" class="dashboard-hidden">
+        <header class="bg-white/95 backdrop-blur-sm sticky top-0 z-40 shadow-md border-b border-gray-100">
+            <div class="container mx-auto px-4 max-w-7xl">
+                <!-- 修正: 只保留返回按鈕 -->
+                <nav class="flex items-center justify-start h-16 text-base font-medium space-x-4">
+                    <button id="deity-hub-back" class="flex-shrink-0 px-3 py-1 rounded-full font-bold bg-teal-500 text-white hover:bg-teal-600 transition shadow-md">← 返回主儀表板</button>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+            <!-- Hero -->
+            <section class="text-center p-8 md:p-12 bg-teal-700 text-white rounded-3xl shadow-2xl mb-12">
+                <h2 class="text-3xl md:text-5xl font-black">🏛️ 靈界政府 · 部門導覽</h2>
+                <p class="text-lg md:text-xl opacity-90 mt-3 max-w-3xl mx-auto">延續你的「靈界政府」框架：最高層—中階主管—功能部門。點選部門或直接用情境篩選，即可找到對應神明與能幫到的事。</p>
+            </section>
+
+            <!-- 情境推薦 -->
+            <section id="reco" class="mb-16">
+                <h3 class="text-3xl font-extrabold mb-8 text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">🎯 情境推薦與快速指引</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="card p-6 rounded-xl bg-white shadow-lg">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" for="ctx-need">你現在的需求</label>
+                        <select id="ctx-need" class="w-full border rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
+                            <option value="">— 請選擇 —</option>
+                            <option value="health">健康安寧（收驚、怪病）</option>
+                            <option value="wealth">求財與事業（生意、投資）</option>
+                            <option value="relationship">感情與家庭（婚姻、子女）</option>
+                            <option value="esteem">考試升遷（名望、肯定）</option>
+                            <option value="mission">社會公益（普度、建醮）</option>
+                            <option value="travel">行旅與海上安全（遷徙、遠行）</option>
+                            <option value="spiritual">靈修與通靈（修持、扶鸞）</option>
+                        </select>
+                        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-2" for="ctx-urgency">緊急程度</label>
+                        <select id="ctx-urgency" class="w-full border rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
+                            <option value="low">一般</option>
+                            <option value="mid">中等</option>
+                            <option value="high">高（影響睡眠/反覆困擾）</option>
+                        </select>
+                        <button id="btn-reco" class="mt-6 w-full px-4 py-2 rounded-lg font-bold bg-amber-400 text-teal-900 hover:bg-amber-300 transition shadow-md">產生推薦</button>
+                    </div>
+                    <div class="p-6 rounded-xl bg-teal-50 border border-teal-100 shadow-inner md:col-span-2">
+                        <h4 class="font-black text-xl text-teal-800 mb-3">推薦結果與指引</h4>
+                        <div id="reco-output" class="text-gray-700 space-y-2 min-h-[100px]">
+                            <p class="text-sm opacity-70">（選擇左側條件後，系統將依據靈界部門框架推論出建議的神明與行動方案。）</p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">※ 依你的「部門分工」框架推論：醫療＝保生／華陀；財政＝趙公明／五路財神／土地公；教育＝文昌／魁星／孔子；司法＝城隍／包公／東嶽；軍事＝關聖／哪吒／二郎；社福＝地藏／媽祖／觀音。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 神明一覽 -->
+            <section id="deities">
+                <h3 class="text-3xl font-extrabold mb-8 text-teal-800 border-b-4 border-teal-200 inline-block px-4 pb-2">📋 神明一覽（可篩選）</h3>
+                
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button data-filter="all" class="filter-btn px-4 py-2 rounded-full bg-teal-600 text-white font-bold hover:bg-teal-700">顯示全部</button>
+                    <button data-filter="supreme" class="filter-btn px-4 py-2 rounded-full bg-white text-teal-800 font-semibold border hover:bg-teal-50">最高層</button>
+                    <button data-filter="regional" class="filter-btn px-4 py-2 rounded-full bg-white text-amber-800 font-semibold border hover:bg-amber-50">中階主管</button>
+                    <button data-filter="medical" class="filter-btn px-4 py-2 rounded-full bg-white text-red-800 font-semibold border hover:bg-red-50">醫療</button>
+                    <button data-filter="finance" class="filter-btn px-4 py-2 rounded-full bg-white text-yellow-800 font-semibold border hover:bg-yellow-50">財政</button>
+                    <button data-filter="education" class="filter-btn px-4 py-2 rounded-full bg-white text-blue-800 font-semibold border hover:bg-blue-50">教育</button>
+                    <button data-filter="justice" class="filter-btn px-4 py-2 rounded-full bg-white text-gray-800 font-semibold border hover:bg-gray-50">司法</button>
+                    <button data-filter="military" class="filter-btn px-4 py-2 rounded-full bg-white text-green-800 font-semibold border hover:bg-green-50">軍事</button>
+                    <button data-filter="welfare" class="filter-btn px-4 py-2 rounded-full bg-white text-purple-800 font-semibold border hover:bg-purple-50">社福</button>
+                    <button data-filter="other" class="filter-btn px-4 py-2 rounded-full bg-white text-pink-800 font-semibold border hover:bg-pink-50">其他框架</button>
+                </div>
+
+                <div id="deity-grid" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- 神明卡片將由 JavaScript 渲染 -->
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- /神明互動頁面 -->
+
+
+    <footer class="bg-white border-t border-gray-200/80">
+        <div class="container mx-auto px-4 py-8 text-center text-gray-600">
+            <p class="text-xs">&copy; 2025 宗教「辦事」框架總覽 - 靈性工程學</p>
+        </div>
+    </footer>
+    
+    <!-- Modals (Chapter 4 - 神明部門彈窗) -->
+    <!-- 醫療部門彈窗 -->
+    <div id="dept-medical" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-red-700">🏥 醫療部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**保生大帝、王爺</p>
+            <p class="text-gray-700">**職責範圍：**專治疾病、怪病等與健康相關事宜。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- 財政部門彈窗 -->
+    <div id="dept-finance" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-yellow-700">💰 財政部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**財神、土地公</p>
+            <p class="text-gray-700">**職責範圍：**求財祿、招好運、經濟穩定等。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- 教育部門彈窗 -->
+      <div id="dept-edu" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-blue-700">📚 教育部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**文昌帝君、魁星</p>
+            <p class="text-gray-700">**職責範圍：**考試、升遷、學業精進等。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- 司法部門彈窗 -->
+    <div id="dept-justice" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-gray-700">⚖️ 司法部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**城隍、包公、王爺</p>
+            <p class="text-gray-700">**職責範圍：**裁判爭端、公道正義等。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- 軍事部門彈窗 -->
+    <div id="dept-military" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-green-700">⚔️ 軍事部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**關聖帝君、哪吒</p>
+            <p class="text-gray-700">**職責範圍：**驅邪、斬妖除魔、軍事防禦等。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- 社會福利部門彈窗 -->
+    <div id="dept-welfare" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+            <h3 class="font-bold text-xl mb-4 text-purple-700">🕊️ 社會福利部門</h3>
+            <p class="text-gray-600 mb-2">**專職長官：**地藏王菩薩、普渡公</p>
+            <p class="text-gray-700">**職責範圍：**超渡亡魂、照顧孤魂野鬼等社會福利事宜。</p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+
+    <!-- Details for Process Steps (Chapter 1 - 流程互動使用 Modal) -->
+    <div id="process-modal" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full relative">
+            <h3 id="process-modal-title" class="font-bold text-2xl mb-4 text-teal-800"></h3>
+            <p id="process-modal-content" class="text-gray-700"></p>
+            <p id="process-modal-roles" class="text-sm text-gray-500 mt-4"></p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+
+    <!-- Details for Needs Steps (Chapter 2 - 需求互動使用 Modal) -->
+    <div id="needs-modal" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full relative">
+            <h3 id="needs-modal-title" class="font-bold text-2xl mb-4 text-teal-800"></h3>
+            <!-- 故事內容將動態渲染在這裡 -->
+            <div id="story-content-container" class="text-gray-700 text-lg mb-4"></div>
+            <p id="needs-modal-example" class="text-sm text-gray-500 mt-4 border-t pt-4"></p>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+    
+    <!-- 神明互動頁面 Modal -->
+    <div id="deity-modal" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-[999]">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-xl w-full relative">
+            <h3 id="m-title" class="font-black text-2xl mb-2 text-teal-800"></h3>
+            <p id="m-epithet" class="text-sm text-gray-500 mb-4"></p>
+            <div id="m-body" class="space-y-3 text-gray-700"></div>
+            <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. Navigation & Basic Utilities ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Intersection Observer for highlighting sticky nav links
+            const sections = document.querySelectorAll('section[id]');
+            // 選擇主儀表板的五個章節連結
+            const mainNavLinks = document.querySelectorAll('.main-nav-item'); // 使用新標籤
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.3 };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        mainNavLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+
+            // --- 2. Data Definitions ---
+            
+            // Chapter 1 Process step data
+            const processData = {
+                ask: {
+                    title: '問事（起點）：提問人生難題',
+                    content: '透過乩童（神明降駕）、靈媒（神靈代言）、或扶鸞（神筆書寫），信徒提出生活中最困擾的難題，是辦事的起點。',
+                    roles: '溝通方式：乩童、靈媒、扶鸞。'
+                },
+                solve: {
+                    title: '解事 / 辦事（核心）：神明裁示與行動',
+                    content: '神明給予解決方案，分為兩大類：言論性（指示、勸告）和行動性（法事、施法，如收驚、安太歲）。辦事地點可能是固定廟宇或臨時壇場。',
+                    roles: '核心行動：言論性（指示、勸告）、行動性（法事、施法）。'
+                },
+                role: {
+                    title: '地點與角色分工：執行與還願',
+                    content: '辦事需要明確的分工。法師主持儀式；乩童／扶鸞手傳達神示；信徒必須負責執行神明指令，並在願望達成後還願。',
+                    roles: '主要角色：法師（主持）、乩童／扶鸞手（代言）、信徒（執行與還願）。'
+                }
+            };
+            
+            // Chapter 2 Needs Hierarchy Data (更新為詳細的故事內容)
+            const needsData = {
+                safety: {
+                    title: '① 生命保障層次 (生存安全)',
+                    content: [
+                        '追求活下去、身體健康、安全無憂。辦事提供安全感，減輕焦慮。',
+                        '👉 <strong>故事</strong>：有個孩子晚上嚇到，魂魄不安，父母急得帶去廟裡「收驚」。',
+                        '乩童請神明降駕，用符水、梳子在孩子頭上劃過，孩子安然入睡。',
+                        '<span class="story-highlight">這就是「辦事」滿足了最基本的「安全需求」。</span>'
+                    ],
+                    example: '收驚、安太歲'
+                },
+                economy: {
+                    title: '② 經濟生活層次 (穩定追求)',
+                    content: [
+                        '追求財富、工作、生活安定。辦事提供行動建議或化煞改運，給予神明庇護的保證。',
+                        '👉 <strong>故事</strong>：一位小商人生意一直不順，天天覺得自己「被衰運卡住」。',
+                        '於是去土地公廟辦事，神明開示：「要換地點擺攤，並且先還願再求財。」結果他搬到市場口，果然客人變多。',
+                        '<span class="story-highlight">「辦事」讓人覺得自己不是孤軍奮戰，而是有神明護航。</span>'
+                    ],
+                    example: '求財、改運'
+                },
+                belonging: {
+                    title: '③ 人際情感層次 (愛與歸屬)',
+                    content: [
+                        '追求愛情、婚姻、家庭和諧、人際穩定。辦事透過神明仲裁，減輕家庭糾紛，提供歸屬感。',
+                        '👉 <strong>故事</strong>：古早有人去媽祖廟問事：「我和這個人適不適合結婚？」媽祖透過擲筊回答「允筊」。',
+                        '相反，如果得到「笑筊」或「無筊」，也許就會被勸退。',
+                        '<span class="story-highlight">「辦事」成為人際關係的仲裁者，減少爭端。</span>'
+                    ],
+                    example: '婚姻仲裁、家庭問題解決'
+                },
+                esteem: {
+                    title: '④ 成就地位層次 (社會肯定)',
+                    content: [
+                        '追求成功、升遷、社會尊重。辦事透過神明加持，強化信心，讓人覺得努力之外還有「天命」的支持。',
+                        '👉 <strong>故事</strong>：學生考試前，去文昌帝君廟辦事，神明指示要「心存正念」，並賜下文昌筆符。',
+                        '學生放在書桌上，安心準備，最後果然考取功名。',
+                        '<span class="story-highlight">「辦事」像是一種「信心加持」，讓人覺得努力不會白費。</span>'
+                    ],
+                    example: '考試、升遷祈福'
+                },
+                self_actualization: {
+                    title: '⑤ 自我實現層次 (夢想突破)',
+                    content: [
+                        '追求實現夢想、創業、從事熱愛的事。辦事提供「方向感」與「信心」，幫助信眾在大膽冒險中尋找心理支撐。',
+                        '👉 <strong>故事</strong>：有年輕人想創業，卻猶豫要不要辭職。他去城隍廟問事，神明透過扶鸞寫下「勿懼艱難，勇往直前」八字。',
+                        '他因此下定決心，雖然辛苦，但後來真的闖出名號。',
+                        '<span class="story-highlight">「辦事」在這一層次，給的是勇氣與方向感。</span>'
+                    ],
+                    example: '創業方向指引、志業突破'
+                },
+                transcendence: {
+                    title: '⑥ 超越意義層次 (超越自我)',
+                    content: [
+                        '追求貢獻給家庭、社會、甚至宇宙。辦事提供神明「認可」與「合法性」，讓行動者獲得使命感。',
+                        '👉 <strong>故事</strong>：在鹿港媽祖遶境時，庄頭信眾問：「要不要今年籌辦大型普度？」媽祖指示「應辦，以濟孤魂」。',
+                        '這不只是安靈，更是社區公益，大家齊心參與，凝聚了整個地方。',
+                        '<span class="story-highlight">「辦事」在最高層次，成為社會道德與公共行動的合法化力量。</span>'
+                    ],
+                    example: '公益事業、普度建醮'
+                }
+            };
+
+            // --- 3. Modal Logic (General for Chapters 2 & 4) ---
+
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.modal-close');
+
+            function closeModal(modal) {
+                modal.classList.remove('is-open');
+                // 確保移除 active class 以觸發淡出效果
+                modal.classList.remove('opacity-1'); 
+            }
+
+            // Close modal button listener
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    closeModal(button.closest('.modal'));
+                });
+            });
+
+            // Close modal by clicking backdrop
+            modals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                          closeModal(modal);
+                    }
+                });
+            });
+            
+            // Close modal by pressing Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape") {
+                    modals.forEach(modal => closeModal(modal));
+                }
+            });
+
+            // --- 4. Chapter Specific Modal/Interaction Handlers ---
+
+            // Chapter 1: Process Flow Handlers (使用 Modal)
+            const flowSteps = document.querySelectorAll('.flow-step');
+            const processModal = document.getElementById('process-modal');
+            const processModalTitle = document.getElementById('process-modal-title');
+            const processModalContent = document.getElementById('process-modal-content');
+            const processModalRoles = document.getElementById('process-modal-roles');
+
+            flowSteps.forEach(block => {
+                block.addEventListener('click', () => {
+                    const key = block.getAttribute('data-step');
+                    const data = processData[key];
+                    
+                    // 突出顯示被點擊的步驟
+                    flowSteps.forEach(step => step.classList.remove('active'));
+                    block.classList.add('active');
+
+                    // 填入 Modal 內容並顯示
+                    processModalTitle.textContent = data.title;
+                    processModalContent.textContent = data.content;
+                    processModalRoles.textContent = '主要角色與職責：' + data.roles;
+                    
+                    // 移除 opacity-0 類別，觸發淡入效果
+                    processModal.classList.add('is-open'); 
+                });
+            });
+            
+            // Chapter 2: Needs Hierarchy Handlers (使用 Modal + 動畫故事)
+            const needsModal = document.getElementById('needs-modal');
+            const needsModalTitle = document.getElementById('needs-modal-title');
+            const storyContainer = document.getElementById('story-content-container');
+            const needsModalExample = document.getElementById('needs-modal-example');
+
+            document.querySelectorAll('.need-block').forEach(block => {
+                block.addEventListener('click', () => {
+                    const key = block.getAttribute('data-need');
+                    const data = needsData[key];
+                    needsModalTitle.textContent = data.title;
+                    needsModalExample.textContent = '核心對應行為：' + data.example;
+                    
+                    // 清空故事容器並準備動畫
+                    storyContainer.innerHTML = '';
+                    
+                    // 逐行渲染故事內容，並延遲動畫
+                    data.content.forEach((line, index) => {
+                        // 創建一個新的 div 來容納每行文本
+                        const p = document.createElement('div');
+                        p.classList.add('story-animated-text', 'text-gray-700', 'text-lg'); // 使用 div 確保 display: block
+                        p.innerHTML = line; // 插入內容，允許 HTML 標籤
+                        
+                        // 設置動畫延遲 (增加到 0.4s)
+                        p.style.animationDelay = `${index * 0.4}s`;
+                        
+                        storyContainer.appendChild(p);
+                    });
+                    
+                    // 顯示 Modal
+                    needsModal.classList.add('is-open');
+                });
+            });
+
+            // Chapter 4: Deity System Handlers (使用 Modal + 互動篩選器)
+            const deptModalButtons = document.querySelectorAll('.dept-button');
+            deptModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetModalId = button.getAttribute('data-modal-target');
+                    const targetModal = document.getElementById(targetModalId);
+                    if (targetModal) {
+                        targetModal.classList.add('is-open');
+                    }
+                });
+            });
+            
+            // 神明層級篩選器邏輯 (Chapter 4)
+            const allOrgElements = document.querySelectorAll('[data-level], .w-1.h-8.bg-teal-400'); // 包括層級卡片和分隔線
+            const filterButtons = document.querySelectorAll('.level-filter-btn');
+
+            function updateOrgVisibility(filter) {
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-teal-500', 'text-white');
+                    btn.classList.add('bg-white', 'text-teal-800');
+                });
+                // 修正：確保只對當前儀表板的按鈕操作
+                const activeFilterButton = document.querySelector(`.level-filter-btn[data-filter="${filter}"]`);
+                if (activeFilterButton) {
+                    activeFilterButton.classList.add('bg-teal-500', 'text-white');
+                    activeFilterButton.classList.remove('bg-white', 'text-teal-800');
+                }
+
+                allOrgElements.forEach(el => {
+                    if (filter === 'all' || el.getAttribute('data-level') === filter) {
+                        el.classList.remove('hidden', 'opacity-0');
+                        el.classList.add('level-visible');
+                    } else {
+                        el.classList.add('hidden', 'opacity-0');
+                        el.classList.remove('level-visible');
+                    }
+                });
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filter = button.getAttribute('data-filter');
+                    updateOrgVisibility(filter);
+                });
+            });
+            
+            // 初始化時顯示全部
+            updateOrgVisibility('all');
+
+
+            // Chapter 3: Collapsible Cards Logic (三重核心 - Max-Height 動畫)
+            document.querySelectorAll('.collapsible-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const content = card.querySelector('.collapsible-content');
+                    const icon = card.querySelector('.collapsible-icon');
+
+                    // 檢查 content 是否有 active class，並切換狀態
+                    if (content.classList.contains('active')) {
+                        // 關閉 (移除 active class)
+                        content.classList.remove('active');
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        // 開啟
+                        // 選擇性地關閉所有其他開啟的卡片
+                        document.querySelectorAll('.collapsible-content.active').forEach(openContent => {
+                            if (openContent !== content) {
+                                openContent.classList.remove('active');
+                                // 由於 card:hover 效果會影響，我們必須找到該卡片的 icon 進行操作
+                                openContent.closest('.collapsible-card').querySelector('.collapsible-icon').classList.remove('rotate-180');
+                            }
+                        });
+                        
+                        content.classList.add('active');
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+            
+            // Chapter 5/6: Tabbed Interface Logic (內功哲學)
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+
+                    // 1. Deactivate all tabs and content
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        // 移除所有活躍和顏色類別
+                        btn.classList.remove('active-tab', 'border-orange-500', 'border-emerald-500', 'text-orange-700', 'text-emerald-700');
+                        // 設置非活躍狀態
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                        // 確保 hover 顏色回來
+                        if (btn.getAttribute('data-tab') === 'inner_skill') {
+                             btn.classList.add('hover:text-orange-700', 'hover:border-orange-500');
+                        } else {
+                             btn.classList.add('hover:text-emerald-700', 'hover:border-emerald-500');
+                        }
+                    });
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+
+                    // 2. Activate selected tab and content
+                    document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+
+                    if (targetTab === 'inner_skill') {
+                        // 設定活躍樣式
+                        button.classList.add('active-tab', 'border-orange-500', 'text-orange-700');
+                        button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-orange-700', 'hover:border-orange-500');
+                    } else if (targetTab === 'philosophy') {
+                        // 設定活躍樣式
+                        button.classList.add('active-tab', 'border-emerald-500', 'text-emerald-700');
+                        button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-emerald-700', 'hover:border-emerald-500');
+                    }
+                });
+            });
+
+            // Set initial active state for the first tab display
+            const initialTabButton = document.querySelector('.tab-button[data-tab="inner_skill"]');
+            
+            if (initialTabButton) {
+                initialTabButton.classList.add('active-tab', 'border-orange-500', 'text-orange-700');
+                initialTabButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-orange-700', 'hover:border-orange-500');
+                document.getElementById('tab-inner_skill').classList.remove('hidden');
+            }
+
+            // --- 5. 頁面切換核心邏輯 ---
+            const mainDashboard = document.getElementById('main-dashboard');
+            const deepDivePage = document.getElementById('deep-dive-page');
+            const deityHubPage = document.getElementById('deity-hub-page'); // 新增神明頁面元素
+            
+            // 所有切換按鈕
+            const deepDiveToggleButtons = document.querySelectorAll('#deep-dive-toggle, #mobile-deep-dive-toggle');
+            const deityHubToggleButtons = document.querySelectorAll('#deity-hub-toggle, #mobile-deity-hub-toggle'); // 新增神明按鈕
+
+            // 深度頁面模組
+            const deepDiveModules = document.querySelectorAll('.deep-dive-module');
+
+            // 輔助函數：隱藏所有次級儀表板
+            function hideAllSubDashboards() {
+                deepDivePage.classList.remove('dashboard-visible');
+                deepDivePage.classList.add('dashboard-hidden');
+                deityHubPage.classList.remove('dashboard-visible');
+                deityHubPage.classList.add('dashboard-hidden');
+                deepDiveModules.forEach(module => module.classList.remove('animate-in'));
+            }
+
+            // 核心切換函數：切換到指定目標 (main, deep, deity)
+            function switchDashboard(target, scrollTargetId = null) {
+                
+                const isSubPageActive = target !== 'main';
+
+                // 步驟 3: 處理主導航連結的可見性 (流程圖, 金字塔等)
+                // 當切換到子頁面時，隱藏主儀表板的章節連結
+                mainNavLinks.forEach(link => {
+                    link.classList.toggle('hidden', isSubPageActive);
+                });
+                
+                // 步驟 3b: 處理切換按鈕的文字和可見性 (關鍵修正區域)
+                deepDiveToggleButtons.forEach(btn => {
+                    const isDeepToggle = btn.id === 'deep-dive-toggle' || btn.id === 'mobile-deep-dive-toggle';
+                    
+                    // 在主頁面時，顯示所有切換按鈕並顯示 "靈修深度解析"
+                    // 在深度頁面時，顯示自身按鈕，文字改為 "返回主儀表板"，並隱藏另一個子頁面的按鈕
+                    if (target === 'deep') {
+                        btn.classList.toggle('hidden', !isDeepToggle);
+                        btn.textContent = isDeepToggle ? '← 返回主儀表板' : '靈修深度解析';
+                    } else if (target === 'deity') {
+                        btn.classList.toggle('hidden', isDeepToggle);
+                        btn.textContent = !isDeepToggle ? '← 返回主儀表板' : '靈修深度解析';
+                    } else { // main
+                        btn.classList.remove('hidden');
+                        btn.textContent = isDeepToggle ? '靈修深度解析' : '神明互動';
+                    }
+                });
+
+                deityHubToggleButtons.forEach(btn => {
+                    const isDeityToggle = btn.id === 'deity-hub-toggle' || btn.id === 'mobile-deity-hub-toggle';
+                    
+                    if (target === 'deep') {
+                        btn.classList.toggle('hidden', isDeityToggle);
+                    } else if (target === 'deity') {
+                        btn.classList.toggle('hidden', !isDeityToggle);
+                        btn.textContent = isDeityToggle ? '← 返回主儀表板' : '神明互動';
+                    } else { // main
+                        btn.classList.remove('hidden');
+                        btn.textContent = isDeityToggle ? '神明互動' : '靈修深度解析';
+                    }
+                });
+                
+                // 1. 隱藏/顯示儀表板
+                mainDashboard.classList.toggle('dashboard-hidden', isSubPageActive);
+                mainDashboard.classList.toggle('dashboard-visible', !isSubPageActive);
+                
+                // 2. 隱藏所有子頁面
+                hideAllSubDashboards();
+                
+
+                // 4. 延遲切換和顯示
+                setTimeout(() => {
+                    if (target === 'main') {
+                        // 處理滾動到特定章節
+                        if (scrollTargetId) {
+                            document.querySelector(scrollTargetId).scrollIntoView({ behavior: 'instant' });
+                        } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+
+                    } else if (target === 'deep') {
+                        deepDivePage.classList.remove('dashboard-hidden');
+                        deepDivePage.classList.add('dashboard-visible');
+                        
+                        // 觸發深度頁面內容的逐一動畫
+                        deepDiveModules.forEach((module) => {
+                            const delay = parseFloat(module.style.getPropertyValue('--delay') || 0) * 1000;
+                            setTimeout(() => {
+                                module.classList.add('animate-in');
+                            }, delay + 100);
+                        });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    } else if (target === 'deity') {
+                        deityHubPage.classList.remove('dashboard-hidden');
+                        deityHubPage.classList.add('dashboard-visible');
+                        
+                        // 渲染神明卡片
+                        renderDeities('all');
+
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }, 500); // 延遲 500ms 配合 opacity 過渡
+            }
+
+
+            // 事件：主導航按鈕 (靈修深度解析)
+            deepDiveToggleButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // 判斷當前頁面
+                    const isActive = deepDivePage.classList.contains('dashboard-visible');
+                    switchDashboard(isActive ? 'main' : 'deep');
+                });
+            });
+
+            // 事件：主導航按鈕 (神明互動)
+            deityHubToggleButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // 判斷當前頁面
+                    const isActive = deityHubPage.classList.contains('dashboard-visible');
+                    switchDashboard(isActive ? 'main' : 'deity');
+                });
+            });
+
+
+            // 事件：處理深度頁面 (Deep Dive Page) 的返回按鈕
+            document.querySelectorAll('#deep-dive-back').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    switchDashboard('main');
+                });
+            });
+
+            // 事件：處理神明頁面 (Deity Hub Page) 的返回按鈕
+            document.querySelectorAll('#deity-hub-back').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    switchDashboard('main');
+                });
+            });
+            
+            // --- 6. 神明互動頁面邏輯 (Deity Hub Logic) ---
+            
+            // --- Data for Deity Hub ---
+            const DEPT_LABEL = {
+                all:'全部', supreme:'最高層', regional:'中階主管', medical:'醫療', 
+                finance:'財政', education:'教育', justice:'司法', military:'軍事', 
+                welfare:'社福', travel:'行旅', other:'其他框架'
+            };
+            const labelDept = (deptStr) => {
+                return deptStr.split(',').map(k => DEPT_LABEL[k] || k).join('、');
+            };
+
+            const DEITIES = [
+                // Supreme
+                {id:'jade', name:'玉皇大帝', epithet:'天界之主｜秩序與權威', dept:'supreme', tags:['最高層','秩序','天命'], helps:['總領天綱','重大裁示','保境安民'], story:'祂通常不處理日常小事，是最終的裁決者。祂維護宇宙的基本秩序與平衡，遇到跨部門的重大天命變更，才請示祂。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'良辰吉日', color:'祈願白/金', dir:'向正心而行'}},
+                {id:'sanqing', name:'三清', epithet:'元始/靈寶/道德天尊｜宇宙大綱', dept:'supreme', tags:['最高層','大道','法理'], helps:['大道教化','理則釐定','修真指導'], story:'道教三位最高神，代表道的不同體現。他們主掌天地法則和教義，是修道者尋求本源的對象。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'良辰吉日', color:'祈願白/金', dir:'向正心而行'}},
+                // Regional
+                {id:'chenghuang', name:'城隍爺', epithet:'地方法官｜陰陽秩序', dept:'regional,justice', tags:['中階主管','司法','陰陽'], helps:['爭端裁決','護城安寧','陰陽和諧'], story:'祂像地方的市長兼法院，是陽間與冥界的管理者。祂最常處理地方的治安、瘟疫、和民間的訴訟爭議。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'農曆初一/十五', color:'公正黑/紅', dir:'當地城隍廟'}},
+                {id:'tudigong', name:'土地公', epithet:'里長｜民生與財祿', dept:'regional,finance', tags:['中階主管','財運','基層'], helps:['鎮宅安地','求財求穩','地方庇佑'], story:'最貼近人民生活的基層公務員，負責管理土地、保佑五穀豐登、牲畜平安。也是小額求財、穩定生活的主要對象。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'初二/十六', color:'大地黃/綠', dir:'當地福德祠'}},
+                {id:'wangye', name:'王爺系統', epithet:'地方巡察｜瘟疫防治', dept:'regional,justice,medical', tags:['中階主管','瘟疫','正義'], helps:['瘟疫驅除','治亂安民','查察不法'], story:'巡察地方的大員，常被視為代天巡狩的「特派員」，負責在地方發生重大災禍（如瘟疫）或社會亂象時，出面處理。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'王爺聖誕', color:'威嚴紅/金', dir:'當地王爺廟'}},
+
+                // Functional - Medical
+                {id:'baosheng', name:'保生大帝', epithet:'醫療部門長官｜活人濟世', dept:'medical', tags:['醫療','安神','收驚'], helps:['病痛祈癒','收驚','護身安神'], story:'專責人體健康和生命安全，是信徒生病時最常求助的對象。祂的職能與收驚、解煞等安定心神的事務相關。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'三月十五', color:'草藥綠/白', dir:'保生大帝廟'}},
+                {id:'huatuo', name:'華陀仙師', epithet:'外科妙手｜復健療愈', dept:'medical', tags:['醫療','外科','療愈'], helps:['外傷外科','筋骨療復','身心調理'], story:'被視為外科和針灸的始祖，專責更具體、技術層面的醫療問題，例如筋骨損傷或需要復健的病患。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'九月初九', color:'潔淨白/銀', dir:'藥王廟'}},
+
+                // Functional - Finance
+                {id:'zhaogongming', name:'趙公明', epithet:'武財神｜招財納福', dept:'finance', tags:['財政','招財','護商'], helps:['拓展財路','守財避險','破除財煞'], story:'道教體系中的財神，特別受生意人和軍警界信奉。祂的職責是拓展業務、確保財富流通，並抵抗不義的邪財。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'三月十五', color:'黃金/黑', dir:'財神廟'}},
+                {id:'wulu', name:'五路財神', epithet:'東南西北中｜五路來財', dept:'finance', tags:['財政','五路','市集'], helps:['流通旺運','生意興隆','行銷拓客'], story:'專門管理五方財源，求祂能讓財路廣開、四面八方的財富都能聚集，特別適合從事流通、行銷或市場相關的人。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'初二/十六', color:'五色土/金', dir:'財神廟'}},
+                
+                // Functional - Education
+                {id:'wunchang', name:'文昌帝君', epithet:'學業功名｜啟智加持', dept:'education', tags:['教育','考試','升遷'], helps:['專注清明','考運加持','正念端方'], story:'儒學神祇，主管功名、考試和學業。祂的職責是啟迪智慧，讓考生專注，並給予求職升遷者清明的判斷力。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'二月初三', color:'青綠/白', dir:'文昌廟'}},
+                {id:'kuixing', name:'魁星', epithet:'主文試｜點狀元', dept:'education', tags:['教育','文試','中第'], helps:['臨場穩定','靈感通達','考場順利'], story:'魁星是北斗七星的前四顆星，被視為主宰文運的神祇。祂特別庇佑臨場發揮和關鍵時刻的靈感，專門處理考試中第這類需求。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'七月初七', color:'硃砂紅/黑', dir:'魁星樓/廟'}},
+
+                // Functional - Justice
+                {id:'baogong', name:'包公', epithet:'開封府尹｜鐵面無私', dept:'justice', tags:['司法','公道','清廉'], helps:['斷案公正','遠離訟累','化解冤懟'], story:'民間信仰中的鐵面判官，代表絕對的公正和清廉。求祂協助處理司法糾紛、遠離不義的官司，或尋求公道。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'七月初七', color:'正義藍/黑', dir:'包公廟'}},
+                {id:'dongyue', name:'東嶽大帝', epithet:'冥界審判｜生死簿籍', dept:'justice', tags:['司法','冥府','因果'], helps:['冥司秩序','因果裁量','善惡分明'], story:'主掌人間的生死和冥界的審判。祂是因果業報的執行者，求祂是為了讓亡者安息、或尋求關於重大因果的指引。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'三月二十八', color:'冥府灰/金', dir:'東嶽廟'}},
+
+                // Functional - Military
+                {id:'guandi', name:'關聖帝君', epithet:'武德之宗｜鎮煞護正', dept:'military,finance,justice', tags:['軍事','正氣','護法'], helps:['斬妖除厄','正氣鎮宅','破除不義'], story:'集武德、忠義、財神於一身，是鎮宅驅邪、保平安的強大守護神。祂也負責確保商場上的信用和義氣。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'六月二十四', color:'丹紅/金', dir:'關帝廟'}},
+                {id:'nezha', name:'哪吒三太子', epithet:'英烈少將｜疾速破煞', dept:'military', tags:['軍事','破煞','疾速'], helps:['破邪制煞','化解驚惶','護佑孩童'], story:'身手敏捷、作風勇猛，專門處理緊急的驅邪、破煞問題。也因為祂的形象，常被視為兒童和青少年的守護神。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'九月初九', color:'烈火紅/綠', dir:'太子廟'}},
+
+                // Functional - Welfare
+                {id:'kshitigarbha', name:'地藏王菩薩', epithet:'度亡濟苦｜幽冥慈護', dept:'welfare,justice', tags:['社福','超渡','冥福'], helps:['超拔亡靈','安魂鎮心','減輕悲傷'], story:'佛教中的大慈悲者，誓願度盡地獄眾生。祂的誓願是度盡地獄眾生。祂的職責是超渡亡靈、解除幽冥的苦難，是社會福利中的最終保障。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'七月三十', color:'大地黃/紫', dir:'地藏庵/廟'}},
+                {id:'mazu', name:'媽祖', epithet:'海上守護｜離鄉庇佑', dept:'welfare,travel', tags:['社福','海安','遠行'], helps:['航海平安','遠行順利','外地工作安穩'], story:'海神，廣受漁民和遠行者信奉。祂的職責是確保水路平安、遷徙順利，並庇佑在外地工作或定居的人。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'三月二十三', color:'海洋藍/白', dir:'媽祖廟'}},
+                {id:'guanyin', name:'觀音菩薩', epithet:'慈悲救苦｜千處祈求', dept:'welfare', tags:['社福','慈悲','救苦'], helps:['心靈撫慰','逢凶化吉','母性守護'], story:'廣大慈悲的象徵，能聞聲救苦。祂處理的心靈問題、家庭和諧、求子嗣等，是心靈層面的社福部長。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'二月十九', color:'淨蓮白/綠', dir:'觀音寺/廟'}},
+                // Other (Spiritual/Metaphysical)
+                {id:'luwang', name:'呂祖（呂洞賓）', epithet:'道家仙人｜修真導引', dept:'other', tags:['靈修','丹道','文學'], helps:['修真入道','扶鸞聖示','靜坐養氣'], story:'八仙之一，道家高士，專精於內丹修煉與教化。常在扶鸞中降筆，指導文人或修煉者。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'四月十四', color:'雲紋青/白', dir:'孚佑宮'}},
+                {id:'xuanwun', name:'玄天上帝', epithet:'北方真武｜法術與修煉', dept:'other,military', tags:['靈修','法術','鎮守'], helps:['法術護持','解除業障','鎮守北方'], story:'道教重要神祇，以法術和降魔聞名。祂的信仰與修煉、法術和北方鎮守有關。', mantras:['心正事成','敬天愛人','安忍不動','明心見性'], offerings:['清茶','鮮花','水果'], vows:['行善布施','護持公益','戒口業'], meta:{day:'三月初三', color:'玄黑/紫', dir:'玄天上帝廟'}}
+            ];
+
+
+            // 輔助函數：根據部門獲取卡片顏色
+            const getDeptColor = (dept) => {
+                if (dept.includes('supreme')) return { primary: 'teal-900', secondary: 'amber-300' };
+                if (dept.includes('regional')) return { primary: 'amber-600', secondary: 'white' };
+                if (dept.includes('medical')) return { primary: 'red-500', secondary: 'red-100' };
+                if (dept.includes('finance')) return { primary: 'yellow-500', secondary: 'yellow-100' };
+                if (dept.includes('education')) return { primary: 'blue-500', secondary: 'blue-100' };
+                if (dept.includes('justice')) return { primary: 'gray-500', secondary: 'gray-100' };
+                if (dept.includes('military')) return { primary: 'green-500', secondary: 'green-100' };
+                if (dept.includes('welfare')) return { primary: 'purple-500', secondary: 'purple-100' };
+                return { primary: 'pink-500', secondary: 'pink-100' }; // 'other'
+            };
+
+            // 渲染神明卡片
+            const deityGrid = document.getElementById('deity-grid');
+            const deityModal = document.getElementById('deity-modal');
+            const deityModalTitle = document.getElementById('m-title');
+            const deityModalEpithet = document.getElementById('m-epithet');
+            const deityModalBody = document.getElementById('m-body');
+
+            function renderDeities(filterKey) {
+                deityGrid.innerHTML = '';
+                
+                const fragment = document.createDocumentFragment();
+                DEITIES.forEach(deity => {
+                    const primaryDept = deity.dept.split(',')[0];
+                    if (filterKey === 'all' || deity.dept.includes(filterKey)) {
+                        const colors = getDeptColor(deity.dept);
+                        
+                        const card = document.createElement('div');
+                        card.className = `deity-card card p-5 rounded-xl bg-white shadow-md border-t-4 border-${colors.primary}`;
+                        card.dataset.deityId = deity.id;
+
+                        // 顯示主要部門顏色
+                        let deptLabelClass = '';
+                        if (deity.dept === 'supreme') deptLabelClass = 'bg-teal-900 text-amber-300';
+                        else if (deity.dept.includes('regional')) deptLabelClass = 'bg-amber-600 text-white';
+                        else deptLabelClass = `bg-${colors.secondary} text-${colors.primary.replace('-500', '-800')}`;
+
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-xl text-gray-800">${deity.name}</h4>
+                                <span class="text-xs font-semibold py-1 px-3 rounded-full ${deptLabelClass}">
+                                    ${labelDept(deity.dept)}
+                                </span>
+                            </div>
+                            <p class="text-sm italic text-gray-500 mb-3 truncate">${deity.epithet}</p>
+                            <h5 class="font-semibold text-teal-700 mt-3 mb-1">主要協助領域:</h5>
+                            <p class="text-sm text-gray-600">${deity.helps.slice(0, 2).join('、')}</p>
+                        `;
+
+                        card.addEventListener('click', () => showDeityModal(deity));
+                        fragment.appendChild(card);
+                    }
+                });
+                deityGrid.appendChild(fragment);
+            }
+
+            function showDeityModal(deity) {
+                deityModalTitle.textContent = deity.name;
+                deityModalEpithet.textContent = deity.epithet;
+
+                const colors = getDeptColor(deity.dept);
+                
+                const bodyContent = `
+                    <p><strong>部門職責：</strong> ${labelDept(deity.dept)}</p>
+                    <p><strong>神祇故事：</strong> ${deity.story}</p>
+                    
+                    <div class="mt-4 p-4 rounded-lg bg-${colors.secondary} space-y-2">
+                        <p class="font-bold text-lg text-${colors.primary.replace('-500', '-800')}">祂能幫你什麼？</p>
+                        <p class="text-sm text-gray-700">${deity.helps.join('、 ')}</p>
+                    </div>
+
+                    <div class="mt-4 text-sm text-gray-600 space-y-2">
+                        <p><strong>💡 修持建議：</strong> <span class="font-semibold text-teal-700">${deity.mantras.join(' / ')}</span></p>
+                        <p><strong>📅 最佳祭拜日：</strong> ${deity.meta.day}</p>
+                        <p><strong>🙏 建議供品：</strong> ${deity.offerings.join('、 ')}</p>
+                    </div>
+                `;
+
+                deityModalBody.innerHTML = bodyContent;
+                deityModal.classList.add('is-open');
+            }
+
+            // 篩選器事件 (Deity Hub)
+            document.querySelectorAll('#deities .filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    // 更新按鈕狀態
+                    document.querySelectorAll('#deities .filter-btn').forEach(b => {
+                        b.classList.remove('bg-teal-600', 'text-white');
+                        b.classList.add('bg-white', 'text-teal-800');
+                    });
+                    this.classList.add('bg-teal-600', 'text-white');
+                    this.classList.remove('bg-white', 'text-teal-800');
+
+                    renderDeities(filter);
+                });
+            });
+
+
+            // 情境推薦邏輯 (Deity Hub)
+            const btnReco = document.getElementById('btn-reco');
+            const ctxNeed = document.getElementById('ctx-need');
+            const ctxUrgency = document.getElementById('ctx-urgency');
+            const recoOutput = document.getElementById('reco-output');
+
+            const RECO_MAP = {
+                health: { general: ['保生大帝 (醫療部門)', '收驚安神'], high: ['王爺系統 (疫病驅除)', '立即就醫/法事並重'] },
+                wealth: { general: ['趙公明/五路財神 (財政部門)', '求財路/拓客'], high: ['關聖帝君 (信義守護)', '穩固本心/契約為先'] },
+                relationship: { general: ['觀音菩薩/城隍爺 (社福/司法)', '心靈撫慰/化解爭端'], high: ['城隍爺 (司法裁決)', '尋求公正仲裁'] },
+                esteem: { general: ['文昌帝君 (教育部門)', '專注加持/考試順利'], high: ['魁星 (主文試)', '臨場靈感/決斷'] },
+                mission: { general: ['地藏王菩薩 (社福)', '超渡/公益合法性'], high: ['玉皇大帝 (天界之主)', '重大天命請示'] },
+                travel: { general: ['媽祖 (社福/行旅)', '航海/遠行平安'], high: ['玄天上帝 (鎮守)', '法術護持/解除業障'] },
+                spiritual: { general: ['呂祖/玄天上帝 (其他框架)', '修真入道/靜坐導引'], high: ['三清 (宇宙大綱)', '尋求大道真理/法理釐定'] }
+            };
+
+            if (btnReco) {
+                btnReco.addEventListener('click', () => {
+                    const need = ctxNeed.value;
+                    const urgency = ctxUrgency.value;
+                    
+                    if (!need) {
+                        recoOutput.innerHTML = '<p class="text-red-600 font-bold">請先選擇您的需求！</p>';
+                        return;
+                    }
+
+                    const reco = RECO_MAP[need];
+                    let lines = [];
+                    
+                    if (urgency === 'high') {
+                        lines.push(`<p class="font-bold text-red-600">🚨 緊急建議 (${urgency}級):</p>`);
+                        lines.push(`<p>主要神祇：<strong>${reco.high[0]}</strong></p>`);
+                        lines.push(`<p>行動指引：${reco.high[1]}</p>`);
+                    } else {
+                        lines.push(`<p class="font-bold text-teal-800">✅ 建議指引:</p>`);
+                        lines.push(`<p>主要神祇：<strong>${reco.general[0]}</strong></p>`);
+                        lines.push(`<p>行動指引：${reco.general[1]}</p>`);
+                    }
+
+                    recoOutput.innerHTML = lines.join('');
+                });
+            }
+
+            // Init Deity Hub
+            if (deityHubPage.classList.contains('dashboard-visible')) {
+                renderDeities('all');
+            }
+
+
+            // 確保初始化時只有主儀表板是可見的
+            mainDashboard.classList.add('dashboard-visible');
+            deepDivePage.classList.add('dashboard-hidden');
+            deityHubPage.classList.add('dashboard-hidden');
+            
+        });
+    </script>
+</body>
+</html>
